@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Classroom Economy</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header admin-header">
+        <div class="container">
+            <h1 class="logo">🏫 Classroom Economy Admin</h1>
+            <div class="user-info">
+                <span class="welcome-text">Welcome, <span id="adminName">Admin</span></span>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="admin-main">
+        <div class="container">
+            <!-- Admin Navigation -->
+            <nav class="admin-nav">
+                <button class="nav-btn active" onclick="showTab('overview')">Overview</button>
+                <button class="nav-btn" onclick="showTab('users')">Users</button>
+                <button class="nav-btn" onclick="showTab('transactions')">Transactions</button>
+                <button class="nav-btn" onclick="showTab('pending')">Pending Approval</button>
+                <button class="nav-btn" onclick="showTab('new-transaction')">New Transaction</button>
+            </nav>
+
+            <!-- Overview Tab -->
+            <section id="overview" class="admin-section active">
+                <h2>System Overview</h2>
+                <div class="overview-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalUsers">0</div>
+                        <div class="stat-label">Total Students</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalCurrency">$0.00</div>
+                        <div class="stat-label">Total Currency</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="pendingTransactions">0</div>
+                        <div class="stat-label">Pending Approval</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="todayTransactions">0</div>
+                        <div class="stat-label">Today's Transactions</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Users Tab -->
+            <section id="users" class="admin-section">
+                <div class="section-header">
+                    <h2>User Management</h2>
+                    <div class="controls">
+                        <input type="text" id="userSearch" placeholder="Search users...">
+                        <button class="btn-secondary" onclick="addNewUser()">Add User</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th onclick="sortUsers('name')">Name ↕</th>
+                                <th onclick="sortUsers('balance')">Balance ↕</th>
+                                <th onclick="sortUsers('totalEarned')">Total Earned ↕</th>
+                                <th onclick="sortUsers('totalSpent')">Total Spent ↕</th>
+                                <th onclick="sortUsers('lastActive')">Last Active ↕</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- Users will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- All Transactions Tab -->
+            <section id="transactions" class="admin-section">
+                <div class="section-header">
+                    <h2>All Transactions</h2>
+                    <div class="filters">
+                        <input type="text" id="transactionSearch" placeholder="Search transactions...">
+                        <select id="adminStatusFilter">
+                            <option value="">All Statuses</option>
+                            <option value="approved">Approved</option>
+                            <option value="pending">Pending</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                        <select id="adminTypeFilter">
+                            <option value="">All Types</option>
+                            <option value="earning">Earnings</option>
+                            <option value="purchase">Purchases</option>
+                            <option value="request">Requests</option>
+                        </select>
+                        <input type="date" id="dateFilter">
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTransactions('date')">Date ↕</th>
+                                <th onclick="sortTransactions('user')">User ↕</th>
+                                <th onclick="sortTransactions('type')">Type ↕</th>
+                                <th onclick="sortTransactions('amount')">Amount ↕</th>
+                                <th onclick="sortTransactions('description')">Description ↕</th>
+                                <th onclick="sortTransactions('status')">Status ↕</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsTableBody">
+                            <!-- Transactions will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Pending Approval Tab -->
+            <section id="pending" class="admin-section">
+                <div class="section-header">
+                    <h2>Pending Approval</h2>
+                    <div class="bulk-actions">
+                        <button class="btn-success" onclick="bulkApprove()">Approve All</button>
+                        <button class="btn-danger" onclick="bulkReject()">Reject All</button>
+                    </div>
+                </div>
+                <div class="pending-list" id="pendingList">
+                    <!-- Pending transactions will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- New Transaction Tab -->
+            <section id="new-transaction" class="admin-section">
+                <h2>Create New Transaction</h2>
+                <form class="admin-transaction-form" id="adminTransactionForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="adminTransactionType">Transaction Type</label>
+                            <select id="adminTransactionType" name="transactionType" required>
+                                <option value="">Select type</option>
+                                <option value="earning">Award Currency</option>
+                                <option value="purchase">Deduct Currency</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="adminAmount">Amount ($)</label>
+                            <input type="number" id="adminAmount" name="amount" step="0.01" min="0.01" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminDescription">Description</label>
+                        <input type="text" id="adminDescription" name="description" placeholder="Reason for transaction" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Recipients</label>
+                        <div class="recipient-options">
+                            <label class="radio-label">
+                                <input type="radio" name="recipientType" value="single" checked>
+                                Single Student
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="recipientType" value="all">
+                                All Students
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group" id="singleRecipientGroup">
+                        <label for="adminRecipient">Select Student</label>
+                        <select id="adminRecipient" name="recipient">
+                            <option value="">Choose a student</option>
+                            <!-- Students will be populated by JavaScript -->
+                        </select>
+                    </div>
+                    <div class="form-group" id="allRecipientsGroup" style="display: none;">
+                        <p class="info-text">This transaction will be applied to all students in the system.</p>
+                    </div>
+                    <button type="submit" class="submit-btn">Create Transaction</button>
+                </form>
+            </section>
+        </div>
+    </main>
+
+    <!-- User Modal -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="userModalTitle">User Details</h3>
+                <span class="close" onclick="closeUserModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="userModalBody">
+                <!-- User details will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction Modal -->
+    <div id="adminTransactionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Transaction Details</h3>
+                <span class="close" onclick="closeTransactionModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="adminTransactionModalBody">
+                <!-- Transaction details will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

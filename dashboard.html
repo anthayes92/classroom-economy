@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Classroom Economy</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header dashboard-header">
+        <div class="container">
+            <h1 class="logo">🏫 Classroom Economy</h1>
+            <div class="user-info">
+                <span class="welcome-text">Welcome, <span id="studentName">Student</span></span>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-main">
+        <div class="container">
+            <!-- Balance Section -->
+            <section class="balance-section">
+                <div class="balance-card">
+                    <h2>Current Balance</h2>
+                    <div class="balance-amount">
+                        <span class="currency">$</span>
+                        <span id="currentBalance">0.00</span>
+                    </div>
+                </div>
+                <div class="quick-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalEarned">$0.00</div>
+                        <div class="stat-label">Total Earned</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalSpent">$0.00</div>
+                        <div class="stat-label">Total Spent</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="transactionCount">0</div>
+                        <div class="stat-label">Transactions</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- New Transaction Section -->
+            <section class="new-transaction-section">
+                <div class="section-header">
+                    <h2>Make a Transaction</h2>
+                </div>
+                <form class="transaction-form" id="transactionForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="transactionType">Type</label>
+                            <select id="transactionType" name="transactionType" required>
+                                <option value="">Select type</option>
+                                <option value="purchase">Purchase</option>
+                                <option value="request">Request Payment</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="amount">Amount ($)</label>
+                            <input type="number" id="amount" name="amount" step="0.01" min="0.01" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <input type="text" id="description" name="description" placeholder="What is this transaction for?" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="recipient">Recipient (optional)</label>
+                        <input type="text" id="recipient" name="recipient" placeholder="Leave empty for teacher/admin">
+                    </div>
+                    <button type="submit" class="submit-btn">Submit Transaction</button>
+                </form>
+            </section>
+
+            <!-- Transaction History Section -->
+            <section class="transaction-history-section">
+                <div class="section-header">
+                    <h2>Transaction History</h2>
+                    <div class="filters">
+                        <select id="statusFilter">
+                            <option value="">All Statuses</option>
+                            <option value="approved">Approved</option>
+                            <option value="pending">Pending</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                        <select id="typeFilter">
+                            <option value="">All Types</option>
+                            <option value="earning">Earnings</option>
+                            <option value="purchase">Purchases</option>
+                            <option value="request">Requests</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="transaction-list" id="transactionList">
+                    <!-- Transactions will be populated by JavaScript -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Transaction Modal -->
+    <div id="transactionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Transaction Details</h3>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Transaction details will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

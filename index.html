@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classroom Economy - Welcome</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">🏫 Classroom Economy</h1>
+            <nav class="nav">
+                <a href="#about" class="nav-link">About</a>
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#login" class="nav-link login-btn">Login</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h2 class="hero-title">Learn Economics Through Experience</h2>
+                    <p class="hero-description">
+                        Transform your classroom into a thriving economy where students earn, spend, and manage virtual currency while learning real-world financial skills.
+                    </p>
+                    <button class="cta-button" onclick="scrollToLogin()">Get Started</button>
+                </div>
+                <div class="hero-image">
+                    <div class="economy-visual">
+                        <div class="coin">💰</div>
+                        <div class="coin">🪙</div>
+                        <div class="coin">💵</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="about">
+            <div class="container">
+                <h2 class="section-title">About Classroom Economy</h2>
+                <div class="about-grid">
+                    <div class="about-card">
+                        <div class="about-icon">📚</div>
+                        <h3>Educational</h3>
+                        <p>Students learn financial literacy through hands-on experience with earning, spending, and budgeting.</p>
+                    </div>
+                    <div class="about-card">
+                        <div class="about-icon">🎯</div>
+                        <h3>Engaging</h3>
+                        <p>Gamified learning experience that motivates students to participate and excel in classroom activities.</p>
+                    </div>
+                    <div class="about-card">
+                        <div class="about-icon">📊</div>
+                        <h3>Trackable</h3>
+                        <p>Teachers can monitor student progress and adjust the economy to meet learning objectives.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="features">
+            <div class="container">
+                <h2 class="section-title">Key Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3>💳 Student Accounts</h3>
+                        <p>Each student gets their own account to track earnings and spending</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📈 Transaction History</h3>
+                        <p>Complete record of all transactions for transparency and learning</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>👨‍🏫 Admin Dashboard</h3>
+                        <p>Teachers can manage all accounts and approve transactions</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🎁 Rewards System</h3>
+                        <p>Earn currency for good behavior, completed assignments, and participation</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Login Section -->
+        <section id="login" class="login-section">
+            <div class="container">
+                <div class="auth-container">
+                    <!-- Login Form -->
+                    <div class="auth-form-container" id="loginContainer">
+                        <h2 class="auth-title">Access Your Account</h2>
+                        <form class="auth-form" id="loginForm">
+                            <div class="form-group">
+                                <label for="username">Username</label>
+                                <input type="text" id="username" name="username" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input type="password" id="password" name="password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="userType">Account Type</label>
+                                <select id="userType" name="userType" required>
+                                    <option value="">Select account type</option>
+                                    <option value="student">Student</option>
+                                    <option value="admin">Teacher/Admin</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="auth-submit">Login</button>
+                        </form>
+                        <div class="auth-switch">
+                            <p>Don't have an account? <button class="switch-btn" onclick="showSignup()">Sign Up</button></p>
+                        </div>
+                        <div class="demo-accounts">
+                            <p>Demo Accounts:</p>
+                            <button class="demo-btn" onclick="fillDemo('student')">Student Demo</button>
+                            <button class="demo-btn" onclick="fillDemo('admin')">Admin Demo</button>
+                        </div>
+                    </div>
+
+                    <!-- Sign Up Form -->
+                    <div class="auth-form-container hidden" id="signupContainer">
+                        <h2 class="auth-title">Create New Account</h2>
+                        <form class="auth-form" id="signupForm">
+                            <div class="form-group">
+                                <label for="signupUsername">Username</label>
+                                <input type="text" id="signupUsername" name="username" required minlength="3" maxlength="20">
+                                <small class="form-help">3-20 characters, letters and numbers only. This will be your display name.</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="signupPassword">Password</label>
+                                <input type="password" id="signupPassword" name="password" required minlength="6">
+                                <small class="form-help">At least 6 characters</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="signupConfirmPassword">Confirm Password</label>
+                                <input type="password" id="signupConfirmPassword" name="confirmPassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="signupUserType">Account Type</label>
+                                <select id="signupUserType" name="userType" required>
+                                    <option value="">Select account type</option>
+                                    <option value="student">Student</option>
+                                    <option value="admin">Teacher/Admin (Requires Admin Code)</option>
+                                </select>
+                            </div>
+                            <div class="form-group hidden" id="teacherSelectGroup">
+                                <label for="teacherSelect">Select Your Teacher</label>
+                                <select id="teacherSelect" name="teacherId">
+                                    <option value="">Choose your teacher</option>
+                                    <!-- Teachers will be populated by JavaScript -->
+                                </select>
+                                <small class="form-help">Select the teacher for your classroom</small>
+                            </div>
+                            <div class="form-group hidden" id="adminCodeGroup">
+                                <label for="adminCode">Admin Code</label>
+                                <input type="password" id="adminCode" name="adminCode">
+                                <small class="form-help">Contact your teacher for the admin code</small>
+                            </div>
+                            <button type="submit" class="auth-submit">Create Account</button>
+                        </form>
+                        <div class="auth-switch">
+                            <p>Already have an account? <button class="switch-btn" onclick="showLogin()">Login</button></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Classroom Economy. Made for educational purposes.</p>
+        </div>
+    </footer>
+
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
