@@ -21,6 +21,7 @@ class AdminDashboard {
         this.setupEventListeners();
         this.updateAdminName();
         this.updateUI();
+        this.updatePasswordManagement();
     }
 
     loadData() {
@@ -124,7 +125,7 @@ class AdminDashboard {
 
     calculateTotalEarned(transactions) {
         return transactions
-            .filter(t => t.type === 'earning' && t.status === 'approved')
+            .filter(t => (t.type === 'earning' || t.type === 'request') && t.status === 'approved')
             .reduce((sum, t) => sum + t.amount, 0);
     }
 
@@ -156,6 +157,11 @@ class AdminDashboard {
         const transactionSearch = document.getElementById('transactionSearch');
         if (transactionSearch) {
             transactionSearch.addEventListener('input', () => this.filterTransactions());
+        }
+
+        const passwordUserSearch = document.getElementById('passwordUserSearch');
+        if (passwordUserSearch) {
+            passwordUserSearch.addEventListener('input', () => this.filterPasswordManagement());
         }
 
         // Filter selects
@@ -209,6 +215,7 @@ class AdminDashboard {
         this.displayUsers();
         this.displayTransactions();
         this.displayPendingTransactions();
+        this.updatePasswordManagement();
     }
 
     updateOverviewStats() {
@@ -255,6 +262,7 @@ class AdminDashboard {
                         <button class="btn-secondary btn-small" onclick="viewUser('${user.id}')">View</button>
                         <button class="btn-success btn-small" onclick="addCurrency('${user.id}')">Add $</button>
                         <button class="btn-danger btn-small" onclick="deductCurrency('${user.id}')">Deduct $</button>
+                        <button class="btn-warning btn-small" onclick="resetUserPassword('${user.id}')">Reset Password</button>
                     </td>
                 </tr>
             `;
@@ -329,13 +337,26 @@ class AdminDashboard {
 
         pendingList.innerHTML = pendingTransactions.map(transaction => {
             const date = new Date(transaction.date);
+            
+            // Determine amount prefix and styling based on transaction type
+            let amountPrefix = '';
+            let amountClass = '';
+            
+            if (transaction.type === 'earning' || transaction.type === 'request') {
+                amountPrefix = '+';
+                amountClass = 'positive';
+            } else {
+                amountPrefix = '-';
+                amountClass = 'negative';
+            }
+            
             return `
-                <div class="pending-item">
+                <div class="pending-item ${transaction.type}">
                     <div class="pending-header">
                         <div>
                             <strong>${transaction.userName}</strong> - ${transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
-                            <span class="transaction-amount ${transaction.type === 'earning' ? 'positive' : 'negative'}">
-                                $${transaction.amount.toFixed(2)}
+                            <span class="transaction-amount ${amountClass}">
+                                ${amountPrefix}$${transaction.amount.toFixed(2)}
                             </span>
                         </div>
                         <div class="pending-actions">
@@ -362,12 +383,12 @@ class AdminDashboard {
         const recipientId = formData.get('recipient');
 
         if (!type || !amount || !description || !recipientType) {
-            alert('Please fill in all required fields');
+            notificationManager.error('Please fill in all required fields');
             return;
         }
 
         if (recipientType === 'single' && !recipientId) {
-            alert('Please select a student');
+            notificationManager.error('Please select a student');
             return;
         }
 
@@ -416,7 +437,7 @@ class AdminDashboard {
         this.toggleRecipientFields();
         
         const recipientText = recipientType === 'all' ? 'all students' : recipients[0]?.name;
-        alert(`Transaction successfully applied to ${recipientText}`);
+        notificationManager.success(`Transaction successfully applied to ${recipientText}`);
     }
 
     approveTransaction(userId, transactionId) {
@@ -429,7 +450,7 @@ class AdminDashboard {
         transaction.status = 'approved';
 
         // Update user balance (allow negative balances)
-        if (transaction.type === 'earning') {
+        if (transaction.type === 'earning' || transaction.type === 'request') {
             user.balance += transaction.amount;
         } else if (transaction.type === 'purchase') {
             user.balance -= transaction.amount;
@@ -447,7 +468,7 @@ class AdminDashboard {
         this.loadData();
         this.updateUI();
 
-        alert('Transaction approved');
+        notificationManager.success('Transaction approved');
     }
 
     rejectTransaction(userId, transactionId) {
@@ -471,20 +492,22 @@ class AdminDashboard {
         this.loadData();
         this.updateUI();
 
-        alert('Transaction rejected');
+        notificationManager.success('Transaction rejected');
     }
 
     bulkApprove() {
         const pendingTransactions = this.allTransactions.filter(t => t.status === 'pending');
         
         if (pendingTransactions.length === 0) {
-            alert('No pending transactions to approve');
+            notificationManager.info('No pending transactions to approve');
             return;
         }
 
         if (!confirm(`Approve all ${pendingTransactions.length} pending transactions?`)) {
             return;
         }
+
+        notificationManager.success(`Approved ${pendingTransactions.length} transactions`);
 
         pendingTransactions.forEach(transaction => {
             this.approveTransaction(transaction.userId, transaction.id);
@@ -495,13 +518,15 @@ class AdminDashboard {
         const pendingTransactions = this.allTransactions.filter(t => t.status === 'pending');
         
         if (pendingTransactions.length === 0) {
-            alert('No pending transactions to reject');
+            notificationManager.info('No pending transactions to reject');
             return;
         }
 
         if (!confirm(`Reject all ${pendingTransactions.length} pending transactions?`)) {
             return;
         }
+
+        notificationManager.success(`Rejected ${pendingTransactions.length} transactions`);
 
         pendingTransactions.forEach(transaction => {
             this.rejectTransaction(transaction.userId, transaction.id);
@@ -514,6 +539,47 @@ class AdminDashboard {
 
     filterTransactions() {
         this.displayTransactions();
+    }
+
+    updatePasswordManagement() {
+        const tbody = document.getElementById('passwordManagementTableBody');
+        if (!tbody) return;
+
+        const searchTerm = document.getElementById('passwordUserSearch')?.value.toLowerCase() || '';
+        const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
+        
+        let filteredUsers = this.users;
+
+        if (searchTerm) {
+            filteredUsers = filteredUsers.filter(user => 
+                user.name.toLowerCase().includes(searchTerm) ||
+                user.id.toLowerCase().includes(searchTerm)
+            );
+        }
+
+        tbody.innerHTML = filteredUsers.map(user => {
+            const lastActive = new Date(user.lastActive);
+            const registrationInfo = registeredUsers[user.id];
+            const createdDate = registrationInfo ? new Date(registrationInfo.createdAt) : new Date();
+            const username = registrationInfo ? registrationInfo.username : (user.id === 'student1' ? 'student' : user.id.replace('student_', ''));
+            
+            return `
+                <tr>
+                    <td>${user.name}</td>
+                    <td><strong>${username}</strong></td>
+                    <td>${createdDate.toLocaleDateString()}</td>
+                    <td>${lastActive.toLocaleDateString()}</td>
+                    <td>
+                        <button class="btn-warning btn-small" onclick="resetUserPassword('${user.id}')">Reset Password</button>
+                        <button class="btn-secondary btn-small" onclick="generateTempPassword('${user.id}')">Generate Temp Password</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    filterPasswordManagement() {
+        this.updatePasswordManagement();
     }
 }
 
@@ -601,10 +667,110 @@ function closeTransactionModal() {
     }
 }
 
+function viewTransaction(userId, transactionId) {
+    if (!window.adminDashboard) return;
+    
+    // Find the transaction in the admin's data
+    const transaction = window.adminDashboard.allTransactions.find(t => 
+        t.userId === userId && t.id === transactionId
+    );
+    
+    if (!transaction) {
+        notificationManager.error('Transaction not found');
+        return;
+    }
+    
+    const modal = document.getElementById('adminTransactionModal');
+    const modalBody = document.getElementById('adminTransactionModalBody');
+    
+    if (!modal || !modalBody) return;
+    
+    const date = new Date(transaction.date);
+    const typeIcon = {
+        'earning': '💰',
+        'purchase': '🛒', 
+        'request': '🙋‍♂️'
+    };
+    
+    const statusIcon = {
+        'approved': '✅',
+        'pending': '⏳',
+        'rejected': '❌'
+    };
+    
+    // Determine amount display
+    const isPositive = transaction.type === 'earning' || transaction.type === 'request';
+    const amountPrefix = isPositive ? '+' : '-';
+    const amountClass = transaction.status === 'pending' ? 'pending' : (isPositive ? 'positive' : 'negative');
+    
+    modalBody.innerHTML = `
+        <div class="transaction-detail-view">
+            <div class="transaction-detail-header">
+                <div class="transaction-detail-icon">
+                    ${typeIcon[transaction.type] || '📄'}
+                </div>
+                <div class="transaction-detail-title">
+                    <h3>${transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)} Transaction</h3>
+                    <div class="transaction-detail-amount ${amountClass}">
+                        ${amountPrefix}$${transaction.amount.toFixed(2)}
+                    </div>
+                </div>
+                <div class="transaction-detail-status">
+                    ${statusIcon[transaction.status]} ${transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}
+                </div>
+            </div>
+            
+            <div class="transaction-detail-info">
+                <div class="detail-row">
+                    <strong>Student:</strong> ${transaction.userName}
+                </div>
+                <div class="detail-row">
+                    <strong>Description:</strong> ${transaction.description}
+                </div>
+                <div class="detail-row">
+                    <strong>Date & Time:</strong> ${date.toLocaleString()}
+                </div>
+                ${transaction.recipient ? `
+                    <div class="detail-row">
+                        <strong>Recipient:</strong> ${transaction.recipient}
+                    </div>
+                ` : ''}
+                ${transaction.from ? `
+                    <div class="detail-row">
+                        <strong>Created By:</strong> ${transaction.from}
+                    </div>
+                ` : ''}
+                <div class="detail-row">
+                    <strong>Transaction ID:</strong> <code>${transaction.id}</code>
+                </div>
+                <div class="detail-row">
+                    <strong>User ID:</strong> <code>${transaction.userId}</code>
+                </div>
+            </div>
+            
+            ${transaction.status === 'pending' ? `
+                <div class="transaction-detail-actions">
+                    <h4>Admin Actions</h4>
+                    <div class="action-buttons">
+                        <button class="btn-success" onclick="approveTransaction('${transaction.userId}', '${transaction.id}'); closeTransactionModal();">
+                            ✅ Approve Transaction
+                        </button>
+                        <button class="btn-danger" onclick="rejectTransaction('${transaction.userId}', '${transaction.id}'); closeTransactionModal();">
+                            ❌ Reject Transaction
+                        </button>
+                    </div>
+                </div>
+            ` : ''}
+        </div>
+    `;
+    
+    modal.style.display = 'block';
+}
+
 function addCurrency(userId) {
     const amount = prompt('Enter amount to add:');
     if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
-        alert('Please enter a valid amount');
+        notificationManager.error('Please enter a valid amount');
         return;
     }
 
@@ -637,7 +803,7 @@ function addCurrency(userId) {
             window.adminDashboard.loadData();
             window.adminDashboard.updateUI();
             
-            alert(`Added $${amount} to ${user.name}'s account`);
+            notificationManager.success(`Added $${amount} to ${user.name}'s account`);
         }
     }
 }
@@ -645,7 +811,7 @@ function addCurrency(userId) {
 function deductCurrency(userId) {
     const amount = prompt('Enter amount to deduct:');
     if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
-        alert('Please enter a valid amount');
+        notificationManager.error('Please enter a valid amount');
         return;
     }
 
@@ -678,7 +844,7 @@ function deductCurrency(userId) {
             window.adminDashboard.loadData();
             window.adminDashboard.updateUI();
             
-            alert(`Deducted $${amount} from ${user.name}'s account`);
+            notificationManager.success(`Deducted $${amount} from ${user.name}'s account`);
         }
     }
 }
@@ -718,7 +884,7 @@ function addNewUser() {
     
     // Check if user already exists
     if (localStorage.getItem(`userData_${userId}`)) {
-        alert('User already exists');
+        notificationManager.error('User already exists');
         return;
     }
 
@@ -744,7 +910,89 @@ function addNewUser() {
         window.adminDashboard.populateStudentDropdown();
     }
 
-    alert(`Created new student account for ${name}`);
+    notificationManager.success(`Created new student account for ${name}`);
+}
+
+function resetUserPassword(userId) {
+    if (!window.adminDashboard) return;
+    
+    const user = window.adminDashboard.users.find(u => u.id === userId);
+    if (!user) {
+        notificationManager.error('User not found');
+        return;
+    }
+    
+    const newPassword = prompt(`Set new password for ${user.name}:\n\nRecommended patterns:\n- student123\n- ${user.name.toLowerCase()}2025\n- math${user.name.toLowerCase()}\n\nEnter new password:`);
+    
+    if (!newPassword) {
+        return; // User cancelled
+    }
+    
+    if (newPassword.length < 3) {
+        notificationManager.error('Password must be at least 3 characters long');
+        return;
+    }
+    
+    // Update password in registered users
+    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
+    
+    if (userId === 'student1') {
+        // Handle demo student - we can't actually change demo credentials
+        notificationManager.warning('Demo student password cannot be changed. Demo password is always "demo123"');
+        return;
+    }
+    
+    if (registeredUsers[userId]) {
+        registeredUsers[userId].password = newPassword;
+        localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+        
+        notificationManager.success(`Password updated for ${user.name}. New password: "${newPassword}"`);
+    } else {
+        notificationManager.error('Cannot reset password - user not found in registration system');
+    }
+}
+
+function generateTempPassword(userId) {
+    if (!window.adminDashboard) return;
+    
+    const user = window.adminDashboard.users.find(u => u.id === userId);
+    if (!user) {
+        notificationManager.error('User not found');
+        return;
+    }
+    
+    if (userId === 'student1') {
+        notificationManager.info('Demo student password is always "demo123"');
+        return;
+    }
+    
+    // Generate a simple educational password
+    const patterns = [
+        `${user.name.toLowerCase()}123`,
+        `student${Math.floor(Math.random() * 1000)}`,
+        `class${new Date().getFullYear()}`,
+        `${user.name.toLowerCase()}${new Date().getFullYear()}`
+    ];
+    
+    const tempPassword = patterns[Math.floor(Math.random() * patterns.length)];
+    
+    if (confirm(`Generate temporary password "${tempPassword}" for ${user.name}?`)) {
+        const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
+        
+        if (registeredUsers[userId]) {
+            registeredUsers[userId].password = tempPassword;
+            localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+            
+            // Show password in a more prominent way
+            setTimeout(() => {
+                alert(`Temporary password for ${user.name}:\n\n"${tempPassword}"\n\nPlease write this down and share it with the student.`);
+            }, 500);
+            
+            notificationManager.success(`Temporary password generated for ${user.name}`);
+        } else {
+            notificationManager.error('Cannot generate password - user not found in registration system');
+        }
+    }
 }
 
 // Click outside modal to close

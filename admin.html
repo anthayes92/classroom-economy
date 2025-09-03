@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Classroom Economy</title>
-    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/main.css?v=2024-cache-bust">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -27,6 +27,7 @@
                 <button class="nav-btn" onclick="showTab('transactions')">Transactions</button>
                 <button class="nav-btn" onclick="showTab('pending')">Pending Approval</button>
                 <button class="nav-btn" onclick="showTab('new-transaction')">New Transaction</button>
+                <button class="nav-btn" onclick="showTab('password-management')">Password Management</button>
             </nav>
 
             <!-- Overview Tab -->
@@ -183,6 +184,40 @@
                     <button type="submit" class="submit-btn">Create Transaction</button>
                 </form>
             </section>
+
+            <!-- Password Management Tab -->
+            <section id="password-management" class="admin-section">
+                <div class="section-header">
+                    <h2>Password Management</h2>
+                    <div class="controls">
+                        <input type="text" id="passwordUserSearch" placeholder="Search students...">
+                    </div>
+                </div>
+                <div class="password-management-info">
+                    <div class="info-card">
+                        <h3>🔐 Password Management</h3>
+                        <p>Since this educational tool doesn't use email addresses, teachers can reset student passwords directly. 
+                        Students should use simple, educational passwords that are easy to remember.</p>
+                        <p><strong>Recommended:</strong> Use patterns like "student123", "math2025" etc.</p>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Username</th>
+                                <th>Account Created</th>
+                                <th>Last Active</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="passwordManagementTableBody">
+                            <!-- Students will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         </div>
     </main>
 
@@ -211,6 +246,18 @@
             </div>
         </div>
     </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2025 Classroom Economy. Made for educational purposes.</p>
+                <div class="footer-disclaimer">
+                    <p><strong>🔒 Privacy Notice:</strong> This educational tool currently stores data locally in your browser only. 
+                    Do not enter real personal information. Future versions will use secure server storage with proper data protection.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <script src="js/auth.js"></script>
     <script src="js/admin.js"></script>

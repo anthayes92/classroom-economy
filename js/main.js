@@ -41,7 +41,7 @@ function handleLogin(event) {
 
     // Validate input
     if (!username || !password || !userType) {
-        alert('Please fill in all fields');
+        notificationManager.error('Please fill in all fields');
         return;
     }
 
@@ -50,7 +50,7 @@ function handleLogin(event) {
         // Success - redirect to appropriate dashboard
         authManager.redirectToDashboard();
     } else {
-        alert('Invalid credentials. Try the demo accounts or create a student account with any username/password.');
+        notificationManager.error('Invalid credentials. Try the demo accounts or create a student account with any username/password.');
     }
 }
 
@@ -85,14 +85,14 @@ function handleSignup(event) {
     const result = authManager.signup(username, password, confirmPassword, userType, adminCode, teacherId);
     
     if (result.success) {
-        alert(result.message);
+        notificationManager.success(result.message);
         // Switch back to login form
         showLogin();
         // Pre-fill login form with new user credentials
         document.getElementById('username').value = username;
         document.getElementById('userType').value = userType;
     } else {
-        alert(result.message);
+        notificationManager.error(result.message);
     }
 }
 
@@ -197,3 +197,27 @@ function scrollToLogin() {
         behavior: 'smooth'
     });
 }
+
+function closeBanner() {
+    const banner = document.querySelector('.disclaimer-banner');
+    if (banner) {
+        banner.style.transform = 'translateY(-100%)';
+        setTimeout(() => {
+            banner.style.display = 'none';
+        }, 300);
+        
+        // Remember that user closed the banner
+        localStorage.setItem('disclaimerBannerClosed', 'true');
+    }
+}
+
+// Check if banner should be hidden on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const bannerClosed = localStorage.getItem('disclaimerBannerClosed');
+    if (bannerClosed === 'true') {
+        const banner = document.querySelector('.disclaimer-banner');
+        if (banner) {
+            banner.style.display = 'none';
+        }
+    }
+});

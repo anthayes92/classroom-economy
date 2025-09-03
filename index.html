@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Classroom Economy - Welcome</title>
-    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/main.css?v=2024-cache-bust">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -20,6 +20,20 @@
     </header>
 
     <main>
+        <!-- Educational Disclaimer Banner -->
+        <section class="disclaimer-banner">
+            <div class="container">
+                <div class="disclaimer-content">
+                    <div class="disclaimer-icon">📚</div>
+                    <div class="disclaimer-text">
+                        <strong>Educational Use Only:</strong> This is a free educational tool for classroom learning. 
+                        Please do not enter any real personal information. Use only educational usernames and descriptions.
+                    </div>
+                    <button class="disclaimer-close" onclick="closeBanner()" aria-label="Close banner">×</button>
+                </div>
+            </div>
+        </section>
+
         <!-- Hero Section -->
         <section class="hero">
             <div class="container">
@@ -164,6 +178,14 @@
                                 <input type="password" id="adminCode" name="adminCode">
                                 <small class="form-help">Contact your teacher for the admin code</small>
                             </div>
+                            <div class="form-disclaimer">
+                                <div class="disclaimer-checkbox">
+                                    <input type="checkbox" id="privacyAgreement" name="privacyAgreement" required>
+                                    <label for="privacyAgreement">
+                                        I understand this is for <strong>educational use only</strong> and I will not enter any real personal information.
+                                    </label>
+                                </div>
+                            </div>
                             <button type="submit" class="auth-submit">Create Account</button>
                         </form>
                         <div class="auth-switch">
@@ -177,7 +199,14 @@
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2024 Classroom Economy. Made for educational purposes.</p>
+            <div class="footer-content">
+                <p>&copy; 2025 Classroom Economy. Made for educational purposes.</p>
+                <div class="footer-disclaimer">
+                    <p><strong>🔒 Privacy Notice:</strong> This educational tool currently stores data locally in your browser only. 
+                    Do not enter real personal information. Future versions will use secure server storage with proper data protection.</p>
+                    <p><strong>📚 Educational Use:</strong> Free and open-source for classroom learning about economics and financial literacy.</p>
+                </div>
+            </div>
         </div>
     </footer>
 

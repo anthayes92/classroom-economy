@@ -114,7 +114,7 @@ class StudentDashboard {
         this.transactions.forEach(transaction => {
             if (transaction.status === 'approved') {
                 approvedTransactions++;
-                if (transaction.type === 'earning') {
+                if (transaction.type === 'earning' || transaction.type === 'request') {
                     totalEarned += transaction.amount;
                 } else if (transaction.type === 'purchase') {
                     totalSpent += transaction.amount;
@@ -149,12 +149,12 @@ class StudentDashboard {
         const recipient = formData.get('recipient');
 
         if (!type || !amount || !description) {
-            alert('Please fill in all required fields');
+            notificationManager.error('Please fill in all required fields');
             return;
         }
 
         if (amount <= 0) {
-            alert('Amount must be greater than 0');
+            notificationManager.error('Amount must be greater than 0');
             return;
         }
 
@@ -181,7 +181,7 @@ class StudentDashboard {
         // Reset form
         event.target.reset();
         
-        alert('Transaction submitted for approval');
+        notificationManager.info('Transaction submitted for approval');
     }
 
     autoApproveTransaction(transactionId) {
@@ -228,14 +228,44 @@ class StudentDashboard {
 
         transactionList.innerHTML = filteredTransactions.map(transaction => {
             const date = new Date(transaction.date);
-            const isPositive = transaction.type === 'earning';
+            
+            // Determine styling based on transaction type and status
+            let amountClass = '';
+            let itemClass = transaction.type;
+            let amountPrefix = '';
+            
+            if (transaction.status === 'pending') {
+                // Pending transactions get special styling
+                amountClass = 'pending';
+                itemClass += ' pending';
+                
+                if (transaction.type === 'earning' || transaction.type === 'request') {
+                    amountPrefix = '+';
+                } else {
+                    amountPrefix = '-';
+                }
+            } else if (transaction.status === 'approved') {
+                // Approved transactions get normal positive/negative styling
+                if (transaction.type === 'earning' || transaction.type === 'request') {
+                    amountClass = 'positive';
+                    amountPrefix = '+';
+                } else {
+                    amountClass = 'negative';
+                    amountPrefix = '-';
+                }
+            } else {
+                // Rejected transactions get muted styling
+                amountClass = 'negative';
+                itemClass += ' rejected';
+                amountPrefix = transaction.type === 'earning' ? '+' : '-';
+            }
             
             return `
-                <div class="transaction-item ${transaction.type}" onclick="showTransactionDetails('${transaction.id}')">
+                <div class="transaction-item ${itemClass}" onclick="showTransactionDetails('${transaction.id}')">
                     <div class="transaction-header">
                         <span class="transaction-type">${transaction.type}</span>
-                        <span class="transaction-amount ${isPositive ? 'positive' : 'negative'}">
-                            ${isPositive ? '+' : '-'}$${transaction.amount.toFixed(2)}
+                        <span class="transaction-amount ${amountClass}">
+                            ${amountPrefix}$${transaction.amount.toFixed(2)}
                         </span>
                     </div>
                     <div class="transaction-description">${transaction.description}</div>
@@ -279,28 +309,8 @@ class StudentDashboard {
     }
 
     showNotification(message) {
-        // Simple notification system
-        const notification = document.createElement('div');
-        notification.className = 'notification';
-        notification.textContent = message;
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #10b981;
-            color: white;
-            padding: 1rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            z-index: 1000;
-            animation: slideIn 0.3s ease-out;
-        `;
-
-        document.body.appendChild(notification);
-
-        setTimeout(() => {
-            notification.remove();
-        }, 3000);
+        // Use global notification manager
+        notificationManager.success(message);
     }
 }
 

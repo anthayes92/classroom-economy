@@ -229,3 +229,93 @@ const authManager = new AuthManager();
 function logout() {
     authManager.logout();
 }
+
+// Global notification system
+class NotificationManager {
+    constructor() {
+        this.notifications = [];
+        this.maxNotifications = 3;
+    }
+
+    show(message, type = 'info', duration = 5000) {
+        const notification = this.createNotification(message, type, duration);
+        document.body.appendChild(notification);
+        
+        // Trigger animation
+        requestAnimationFrame(() => {
+            notification.classList.add('show');
+        });
+
+        // Auto remove after duration
+        setTimeout(() => {
+            this.remove(notification);
+        }, duration);
+
+        // Manage max notifications
+        this.notifications.push(notification);
+        if (this.notifications.length > this.maxNotifications) {
+            this.remove(this.notifications[0]);
+        }
+
+        return notification;
+    }
+
+    createNotification(message, type, duration) {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        
+        const icons = {
+            success: '✅',
+            error: '❌',
+            warning: '⚠️',
+            info: 'ℹ️'
+        };
+
+        notification.innerHTML = `
+            <div class="notification-content">
+                <span class="notification-icon">${icons[type] || icons.info}</span>
+                <span class="notification-message">${message}</span>
+                <button class="notification-close" onclick="notificationManager.remove(this.parentElement.parentElement)">×</button>
+            </div>
+        `;
+
+        return notification;
+    }
+
+    remove(notification) {
+        if (!notification || !notification.parentElement) return;
+        
+        notification.classList.remove('show');
+        
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.parentElement.removeChild(notification);
+            }
+            
+            // Remove from tracking array
+            const index = this.notifications.indexOf(notification);
+            if (index > -1) {
+                this.notifications.splice(index, 1);
+            }
+        }, 300);
+    }
+
+    success(message, duration = 4000) {
+        return this.show(message, 'success', duration);
+    }
+
+    error(message, duration = 6000) {
+        return this.show(message, 'error', duration);
+    }
+
+    warning(message, duration = 5000) {
+        return this.show(message, 'warning', duration);
+    }
+
+    info(message, duration = 4000) {
+        return this.show(message, 'info', duration);
+    }
+}
+
+// Create global notification manager instance
+const notificationManager = new NotificationManager();
