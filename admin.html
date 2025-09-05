@@ -4,13 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Classroom Economy</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="styles/main.css?v=2024-cache-bust">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <header class="header admin-header">
         <div class="container">
-            <h1 class="logo">🏫 Classroom Economy Admin</h1>
+            <h1 class="logo">Classroom Economy Admin</h1>
             <div class="user-info">
                 <span class="welcome-text">Welcome, <span id="adminName">Admin</span></span>
                 <button class="logout-btn" onclick="logout()">Logout</button>
@@ -24,7 +25,7 @@
             <nav class="admin-nav">
                 <button class="nav-btn active" onclick="showTab('overview')">Overview</button>
                 <button class="nav-btn" onclick="showTab('users')">Users</button>
-                <button class="nav-btn" onclick="showTab('transactions')">Transactions</button>
+                <button class="nav-btn" onclick="showTab('transactions')">Transaction History</button>
                 <button class="nav-btn" onclick="showTab('pending')">Pending Approval</button>
                 <button class="nav-btn" onclick="showTab('new-transaction')">New Transaction</button>
                 <button class="nav-btn" onclick="showTab('password-management')">Password Management</button>
@@ -84,7 +85,7 @@
             <!-- All Transactions Tab -->
             <section id="transactions" class="admin-section">
                 <div class="section-header">
-                    <h2>All Transactions</h2>
+                    <h2>Transaction History</h2>
                     <div class="filters">
                         <input type="text" id="transactionSearch" placeholder="Search transactions...">
                         <select id="adminStatusFilter">
@@ -197,15 +198,16 @@
                     <div class="info-card">
                         <h3>🔐 Password Management</h3>
                         <p>Since this educational tool doesn't use email addresses, teachers can reset student passwords directly. 
-                        Students should use simple, educational passwords that are easy to remember.</p>
+                        Students should use simple passwords that are easy to remember. 
                         <p><strong>Recommended:</strong> Use patterns like "student123", "math2025" etc.</p>
+                    </p>
+                        <p>Please encourage students to not share their passwords with each other.</p>
                     </div>
                 </div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>Student Name</th>
                                 <th>Username</th>
                                 <th>Account Created</th>
                                 <th>Last Active</th>

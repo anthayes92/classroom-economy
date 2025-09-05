@@ -146,7 +146,6 @@ class StudentDashboard {
         const type = formData.get('transactionType');
         const amount = parseFloat(formData.get('amount'));
         const description = formData.get('description');
-        const recipient = formData.get('recipient');
 
         if (!type || !amount || !description) {
             notificationManager.error('Please fill in all required fields');
@@ -166,9 +165,9 @@ class StudentDashboard {
             type: type,
             amount: amount,
             description: description,
-            recipient: recipient || 'Teacher',
+            recipient: 'Teacher',
             date: new Date().toISOString(),
-            status: type === 'purchase' ? 'pending' : 'pending', // All transactions need approval
+            status: 'pending', // All transactions need approval
             from: this.currentUser.name
         };
 

@@ -565,7 +565,6 @@ class AdminDashboard {
             
             return `
                 <tr>
-                    <td>${user.name}</td>
                     <td><strong>${username}</strong></td>
                     <td>${createdDate.toLocaleDateString()}</td>
                     <td>${lastActive.toLocaleDateString()}</td>

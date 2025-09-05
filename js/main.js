@@ -211,6 +211,125 @@ function closeBanner() {
     }
 }
 
+// Money Shower Animation
+function createMoneyShower() {
+    const container = document.querySelector('.money-shower-container');
+    if (!container) return;
+
+    const moneyEmojis = ['💰', '🪙', '💵', '💸'];
+    
+    function createFallingMoney() {
+        const money = document.createElement('div');
+        money.className = 'falling-money';
+        money.textContent = moneyEmojis[Math.floor(Math.random() * moneyEmojis.length)];
+        
+        // Random horizontal position
+        money.style.left = Math.random() * 250 + 'px';
+        
+        // Fixed animation duration for consistency
+        const duration = 4;
+        money.style.animationDuration = duration + 's';
+        
+        // Remove random delay to prevent stuck icons
+        money.style.animationDelay = '0s';
+        
+        container.appendChild(money);
+        
+        let isClicked = false;
+        
+        // Listen for animation end instead of using setTimeout
+        money.addEventListener('animationend', function() {
+            if (!isClicked && money.parentNode) {
+                money.parentNode.removeChild(money);
+            }
+        });
+        
+        // Fallback cleanup in case animation event doesn't fire
+        const fallbackTimeout = setTimeout(() => {
+            if (!isClicked && money.parentNode) {
+                money.parentNode.removeChild(money);
+            }
+        }, 6000); // Extra long fallback
+        
+        // Add click effect with better animation
+        money.addEventListener('click', function(e) {
+            e.stopPropagation();
+            isClicked = true;
+            clearTimeout(fallbackTimeout);
+            
+            // Get current position to maintain it during spin
+            const currentTransform = window.getComputedStyle(money).transform;
+            const rect = money.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            
+            // Calculate current position relative to container
+            const currentTop = rect.top - containerRect.top;
+            const currentLeft = rect.left - containerRect.left;
+            
+            // Stop the falling animation and fix position
+            money.style.animation = 'none';
+            money.style.top = currentTop + 'px';
+            money.style.left = currentLeft + 'px';
+            
+            // Apply the spinning animation from current position
+            money.style.animation = 'coinClickSpin 0.8s ease-out forwards';
+            
+            setTimeout(() => {
+                if (money.parentNode) {
+                    money.parentNode.removeChild(money);
+                }
+            }, 800);
+        });
+    }
+    
+    // Create money every 800ms for more activity
+    setInterval(createFallingMoney, 800);
+    
+    // Initial burst - multiple coins for immediate visual impact
+    for (let i = 0; i < 4; i++) {
+        setTimeout(createFallingMoney, i * 400);
+    }
+}
+
+// Piggy bank click effect
+function initPiggyBankEffect() {
+    const piggyBank = document.querySelector('.piggy-bank');
+    if (!piggyBank) return;
+    
+    piggyBank.addEventListener('click', function() {
+        // Create burst of coins
+        const container = document.querySelector('.money-shower-container');
+        if (!container) return;
+        
+        const burstEmojis = ['💰', '🪙', '💵', '💸'];
+        
+        for (let i = 0; i < 8; i++) {
+            setTimeout(() => {
+                const coin = document.createElement('div');
+                coin.className = 'falling-money';
+                coin.textContent = burstEmojis[Math.floor(Math.random() * burstEmojis.length)];
+                coin.style.left = Math.random() * 250 + 'px';
+                coin.style.animationDuration = '1.5s';
+                coin.style.fontSize = '2.5rem';
+                
+                container.appendChild(coin);
+                
+                setTimeout(() => {
+                    if (coin.parentNode) {
+                        coin.parentNode.removeChild(coin);
+                    }
+                }, 3000); // Increased cleanup time
+            }, i * 100);
+        }
+        
+        // Piggy bank reaction
+        piggyBank.style.animation = 'none';
+        setTimeout(() => {
+            piggyBank.style.animation = 'bounce 0.5s ease-in-out 3';
+        }, 10);
+    });
+}
+
 // Check if banner should be hidden on page load
 document.addEventListener('DOMContentLoaded', function() {
     const bannerClosed = localStorage.getItem('disclaimerBannerClosed');
@@ -220,4 +339,8 @@ document.addEventListener('DOMContentLoaded', function() {
             banner.style.display = 'none';
         }
     }
+    
+    // Initialize money shower animation
+    createMoneyShower();
+    initPiggyBankEffect();
 });

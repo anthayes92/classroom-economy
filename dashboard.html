@@ -4,13 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard - Classroom Economy</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="styles/main.css?v=2024-cache-bust">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <header class="header dashboard-header">
         <div class="container">
-            <h1 class="logo">🏫 Classroom Economy</h1>
+            <h1 class="logo">Classroom Economy</h1>
             <div class="user-info">
                 <span class="welcome-text">Welcome, <span id="studentName">Student</span></span>
                 <button class="logout-btn" onclick="logout()">Logout</button>
@@ -69,9 +70,13 @@
                         <label for="description">Description</label>
                         <input type="text" id="description" name="description" placeholder="What is this transaction for?" required>
                     </div>
-                    <div class="form-group">
-                        <label for="recipient">Recipient (optional)</label>
-                        <input type="text" id="recipient" name="recipient" placeholder="Leave empty for teacher/admin">
+                    <div class="transaction-info">
+                        <p><strong>📋 Transaction Details:</strong></p>
+                        <ul>
+                            <li><strong>Purchase:</strong> Request to spend your classroom currency</li>
+                            <li><strong>Request:</strong> Ask your teacher for additional currency</li>
+                            <li><strong>Recipient:</strong> All transactions are with your teacher</li>
+                        </ul>
                     </div>
                     <button type="submit" class="submit-btn">Submit Transaction</button>
                 </form>
